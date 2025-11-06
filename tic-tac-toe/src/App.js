@@ -46,7 +46,7 @@ function Board({ xIsNext, squares, onPlay }) {
   if (winner) {
     status = "Winner: " + winner;
   }
-  else if(squares.every(square => square !== null)){
+  else if (squares.every(square => square !== null)) {
     status = "Draw";
   }
   else {
@@ -108,12 +108,15 @@ export default function Game() {
 
 
   return (
-    <div className="game">
-      <div className="game-board">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
-      </div>
-      <div className="game-info">
-        <ol>{moves}</ol>
+    <div className="container">
+      <h1>Tic-tac-toe</h1>
+      <div className="game">
+        <div className="game-board">
+          <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+        </div>
+        <div className="game-info">
+          <ol>{moves}</ol>
+        </div>
       </div>
     </div>
   )
