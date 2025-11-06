@@ -45,7 +45,11 @@ function Board({ xIsNext, squares, onPlay }) {
   let status;
   if (winner) {
     status = "Winner: " + winner;
-  } else {
+  }
+  else if(squares.every(square => square !== null)){
+    status = "Draw";
+  }
+  else {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
 
