@@ -156,3 +156,23 @@ ul {
 button:hover {
   background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
 }
+
+@media (max-width: 768px) {
+  .game {
+    flex-direction: column;
+    padding: 40px;
+    gap: 30px;
+    margin: 20px;
+  }
+
+  .game-info {
+    margin-left: 0;
+    height: 250px;
+    min-width: auto;
+  }
+
+  h1 {
+    font-size: 40px;
+    margin-bottom: 30px;
+  }
+}
