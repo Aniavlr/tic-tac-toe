@@ -19,7 +19,23 @@ function Form() {
     }
 
     setErrors(newErrors);
+
+    if (!newErrors.nickname && !newErrors.password) {
+      saveUserToStorage();
+    }
     return newErrors;
+  }
+
+  function saveUserToStorage() {
+    const userData = {
+      nickname: nickname,
+      password: password,
+      isLoggedIn: true,
+    };
+
+    localStorage.setItem("currentUser", JSON.stringify(userData));
+
+    window.location.href="/game";
   }
 
   return (

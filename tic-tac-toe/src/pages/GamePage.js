@@ -1,7 +1,15 @@
 import Game from "../components/Game";
+import Navigation from "../components/Navigation";
 
 function GamePage() {
-  return <Game />;
+  return (
+    <>
+      <Navigation />
+      <div className="main-content">
+        <Game />
+      </div>
+    </>
+  );
 }
 
 export default GamePage;
