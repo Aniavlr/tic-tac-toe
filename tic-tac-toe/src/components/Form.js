@@ -27,15 +27,34 @@ function Form() {
   }
 
   function saveUserToStorage() {
-    const userData = {
+    const existingUsers = JSON.parse(
+      localStorage.getItem("registeredUsers") || "[]"
+    );
+
+    const userExists = existingUsers.find((user) => user.nickname === nickname);
+    if (userExists) {
+      alert("This nickname is already taken!");
+      return;
+    }
+    const newUser = {
       nickname: nickname,
       password: password,
-      isLoggedIn: true,
+      registeredAt: new Date().toISOString(),
     };
 
-    localStorage.setItem("currentUser", JSON.stringify(userData));
+    existingUsers.push(newUser);
 
-    window.location.href="/game";
+    localStorage.setItem("registeredUsers", JSON.stringify(existingUsers));
+
+    localStorage.setItem(
+      "currentUser",
+      JSON.stringify({
+        nickname: nickname,
+        isLoggedIn: true
+      })
+    );
+
+    window.location.href = "/game";
   }
 
   return (
