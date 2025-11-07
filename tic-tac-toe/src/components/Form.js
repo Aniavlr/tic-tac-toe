@@ -50,7 +50,7 @@ function Form() {
       "currentUser",
       JSON.stringify({
         nickname: nickname,
-        isLoggedIn: true
+        isLoggedIn: true,
       })
     );
 
