@@ -1,5 +1,5 @@
 import ButtonSignIn from "./ButtonSignIn";
-
+import { saveUserToStorage } from "../helper";
 import { useState } from "react";
 
 function Form() {
@@ -10,8 +10,8 @@ function Form() {
   function validate() {
     const newErrors = { nickname: "", password: "" };
 
-    if (nickname.length < 5) {
-      newErrors.nickname = "Nickname must be at least 5 characters";
+    if (nickname.length < 4) {
+      newErrors.nickname = "Nickname must be at least 4 characters";
     }
 
     if (password.length < 5) {
@@ -21,40 +21,9 @@ function Form() {
     setErrors(newErrors);
 
     if (!newErrors.nickname && !newErrors.password) {
-      saveUserToStorage();
+      saveUserToStorage(nickname,password);
     }
     return newErrors;
-  }
-
-  function saveUserToStorage() {
-    const existingUsers = JSON.parse(
-      localStorage.getItem("registeredUsers") || "[]"
-    );
-
-    const userExists = existingUsers.find((user) => user.nickname === nickname);
-    if (userExists) {
-      alert("This nickname is already taken!");
-      return;
-    }
-    const newUser = {
-      nickname: nickname,
-      password: password,
-      registeredAt: new Date().toISOString(),
-    };
-
-    existingUsers.push(newUser);
-
-    localStorage.setItem("registeredUsers", JSON.stringify(existingUsers));
-
-    localStorage.setItem(
-      "currentUser",
-      JSON.stringify({
-        nickname: nickname,
-        isLoggedIn: true,
-      })
-    );
-
-    window.location.href = "/game";
   }
 
   return (

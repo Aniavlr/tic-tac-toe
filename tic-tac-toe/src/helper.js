@@ -1,4 +1,4 @@
-function calculateWinner(squares) {
+export function calculateWinner(squares) {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -18,4 +18,87 @@ function calculateWinner(squares) {
   return null;
 }
 
-export default calculateWinner;
+export function updateLeaderboard(playerName, result) {
+  const leaderboard =
+    JSON.parse(localStorage.getItem("TicTacToeLeaderboard")) || [];
+
+  let playerIndex = leaderboard.findIndex((p) => p.name === playerName);
+  if (playerIndex === -1) {
+    playerIndex = leaderboard.length;
+    leaderboard.push({
+      id: Date.now(),
+      name: playerName,
+      score: 0,
+      totalGames: 0,
+      wins: 0,
+      losses: 0,
+      draws: 0,
+    });
+  }
+  const player = leaderboard[playerIndex];
+
+  player.totalGames++;
+
+  switch (result) {
+    case "win":
+      player.wins++;
+      player.score += 30;
+      break;
+    case "loss":
+      player.losses++;
+      player.score -= 10;
+      break;
+    case "draw":
+      player.draws++;
+      player.score += 5;
+      break;
+    default:
+    //
+  }
+
+  localStorage.setItem("TicTacToeLeaderboard", JSON.stringify(leaderboard));
+}
+
+export function saveUserToStorage(nickname, password) {
+  const existingUsers = JSON.parse(
+    localStorage.getItem("registeredUsers") || "[]"
+  );
+
+  const userExists = existingUsers.find((user) => user.nickname === nickname);
+  if (userExists) {
+       if (userExists.password === password) {
+      localStorage.setItem(
+        "currentUser",
+        JSON.stringify({
+          nickname: nickname,
+          isLoggedIn: true,
+        })
+      );
+      window.location.href = "/game";
+    } else {
+      alert("Wrong password!");
+    }
+    return;
+  }
+  const newUser = {
+    id: Date.now(),
+    nickname: nickname,
+    password: password,
+    registeredAt: new Date().toISOString(),
+  };
+
+  existingUsers.push(newUser);
+
+  localStorage.setItem("registeredUsers", JSON.stringify(existingUsers));
+
+  localStorage.setItem(
+    "currentUser",
+    JSON.stringify({
+      id: newUser.id,
+      nickname: nickname,
+      isLoggedIn: true,
+    })
+  );
+
+  window.location.href = "/game";
+}

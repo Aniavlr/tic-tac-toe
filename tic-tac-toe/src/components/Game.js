@@ -1,13 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Board from "./Board";
-import calculateWinner from "../helper";
+import {calculateWinner, updateLeaderboard} from "../helper";
 
 function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
   const [isBotThinking, setIsBotThinking] = useState(false);
+  const[nickname, setNickname] = useState("");
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
+
+   useEffect(() => {
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+    const storedNickname = currentUser.nickname;
+    
+    if (storedNickname) {
+      setNickname(storedNickname);
+    } else {
+      // Если пользователь не найден, можно показать форму входа
+      console.warn("No user found in localStorage");
+      setNickname("Guest");
+    }
+  }, []);
 
   function handlePlay(nextSquares) {
     const wasXTurn = currentMove % 2 === 0;
@@ -17,6 +31,15 @@ function Game() {
     const newMove = nextHistory.length - 1;
     setCurrentMove(newMove);
 
+    const winner = calculateWinner(nextSquares);
+    const isDraw = !winner && !nextSquares.includes(null);
+    
+    if (winner === 'X') {
+      updateLeaderboard(nickname, "win");
+    } else if (isDraw) {
+      updateLeaderboard(nickname, "draw");
+    }
+
     if (wasXTurn) {
       const winner = calculateWinner(nextSquares);
       if (!winner && nextSquares.includes(null)) {
@@ -25,13 +48,19 @@ function Game() {
           const availableMoves = nextSquares
             .map((square, index) => (square === null ? index : null))
             .filter((index) => index !== null);
-          const randomIndex = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+          const randomIndex =
+            availableMoves[Math.floor(Math.random() * availableMoves.length)];
           const botSquares = [...nextSquares];
           botSquares[randomIndex] = "O";
           const botHistory = [...nextHistory, botSquares];
           setHistory(botHistory);
           setCurrentMove(botHistory.length - 1);
           setIsBotThinking(false);
+
+          const botWinner = calculateWinner(botSquares);
+          if (botWinner === 'O') {
+            updateLeaderboard(nickname, "loss");
+          }
         }, 400);
       }
     }
