@@ -1,7 +1,7 @@
 import Square from "./Square";
 import {calculateWinner} from "../helper";
 
-function Board({ xIsNext, squares, onPlay, isBotThinking }) {
+function Board({ xIsNext, squares, onPlay, isBotThinking, nickname}) {
   function handleClick(i) {
     if (squares[i] || calculateWinner(squares) || isBotThinking) {
       return;
@@ -14,11 +14,11 @@ function Board({ xIsNext, squares, onPlay, isBotThinking }) {
   const winner = calculateWinner(squares);
   let status;
   if (winner) {
-    status = "🏆 Winner: " + winner;
+    status = "🏆 Winner: " + (winner ==="X" ? nickname : "Bot");
   } else if (squares.every((square) => square !== null)) {
     status = "🫱🏼‍🫲🏼 Draw";
   } else {
-    status = "🕐 Next player: " + (xIsNext ? "X" : "O");
+    status = "🕐 Next player: " + (xIsNext ? nickname : "Bot");
   }
 
   return (

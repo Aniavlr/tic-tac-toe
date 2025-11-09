@@ -87,7 +87,7 @@ function Game() {
 
   return (
     <div className="container">
-      <h1>Tic-tac-toe</h1>
+      <h1>Click! Win! Reign!</h1>
       <div className="game">
         <div className="game-board">
           <Board
@@ -95,6 +95,7 @@ function Game() {
             squares={currentSquares}
             onPlay={handlePlay}
             isBotThinking={isBotThinking}
+            nickname ={nickname}
           />
         </div>
         <div className="game-info">
