@@ -371,61 +371,6 @@ label {
   box-shadow: 0 0 0 3px rgba(255, 212, 59, 0.2);
 }
 
-@media (max-width: 768px) {
-  .login-header h1 {
-    font-size: 40px;
-  }
-  .game {
-    flex-direction: column;
-    padding: 40px;
-    gap: 30px;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-    width: auto;
-    max-width: 400px;
-  }
-
-  .game-info {
-    margin-left: 0;
-    height: 250px;
-    min-width: auto;
-    width: 100%;
-    max-width: 300px;
-  }
-
-  h1 {
-    font-size: 40px;
-    margin-bottom: 30px;
-  }
-
-  .nav-container {
-    flex-direction: column;
-    gap: 15px;
-    padding: 0 15px;
-  }
-
-  .nav-left,
-  .nav-right {
-    justify-content: center;
-    width: 100%;
-  }
-
-  .navbar-brand {
-    font-size: 30px;
-    text-align: center;
-  }
-
-  .menu {
-    gap: 10px;
-  }
-
-  .menu a {
-    padding: 8px 12px;
-    font-size: 15px;
-  }
-}
-
 .leaderboard {
   background: rgba(255, 255, 255, 0.95);
   padding: 40px;
@@ -545,4 +490,65 @@ label {
   font-size: 18px;
   color: #4a5568;
   margin: 10px 0;
+}
+
+@media (max-width: 768px) {
+  .login-header h1 {
+    font-size: 40px;
+  }
+  .game {
+    flex-direction: column;
+    padding: 40px;
+    gap: 30px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    width: auto;
+    max-width: 400px;
+  }
+
+  .game-info {
+    margin-left: 0;
+    height: 250px;
+    min-width: auto;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  h1 {
+    font-size: 40px;
+    margin-bottom: 30px;
+  }
+
+  .nav-container {
+    flex-direction: column;
+    gap: 15px;
+    padding: 0 15px;
+  }
+
+  .nav-left,
+  .nav-right {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .navbar-brand {
+    font-size: 30px;
+    text-align: center;
+  }
+
+  .menu {
+    gap: 10px;
+  }
+
+  .menu a {
+    padding: 8px 12px;
+    font-size: 15px;
+  }
+
+  .leaderboard {
+    max-width: 400px;
+    overflow-x: auto;
+    overflow-y: auto;
+  }
 }
