@@ -66,12 +66,13 @@ export function saveUserToStorage(nickname, password) {
 
   const userExists = existingUsers.find((user) => user.nickname === nickname);
   if (userExists) {
-       if (userExists.password === password) {
+    if (userExists.password === password) {
       localStorage.setItem(
         "currentUser",
         JSON.stringify({
           nickname: nickname,
           isLoggedIn: true,
+          registeredAt: userExists.registeredAt,
         })
       );
       window.location.href = "/game";
@@ -97,6 +98,7 @@ export function saveUserToStorage(nickname, password) {
       id: newUser.id,
       nickname: nickname,
       isLoggedIn: true,
+      registeredAt: newUser.registeredAt,
     })
   );
 

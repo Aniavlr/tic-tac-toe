@@ -18,6 +18,7 @@ function Navigation() {
               <li>
                 <a href="/leaderboard">Leaderboard</a>
               </li>
+              <a href="/account" className="account">Account</a>
               <li>
                 <ButtonLogOut/>
               </li>

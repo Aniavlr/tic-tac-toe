@@ -1,8 +1,9 @@
 function Leaderboard() {
-
   const savedLeaderboard =
     JSON.parse(localStorage.getItem("TicTacToeLeaderboard")) || [];
-  const topPlayers = savedLeaderboard.slice(0, 10);
+  const topPlayers = savedLeaderboard
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10);
 
   if (topPlayers.length === 0) {
     return (
