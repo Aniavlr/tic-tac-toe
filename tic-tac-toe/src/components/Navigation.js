@@ -6,9 +6,7 @@ function Navigation() {
       <nav className="navbar">
         <div className="nav-container">
           <div className="nav-left">
-            <a className="navbar-brand" href="/">
-              Tic-Tac-Toe
-            </a>
+            <p className="navbar-brand">Tic-Tac-Toe</p>
           </div>
           <div className="navbar-right">
             <ul className="menu">
@@ -18,9 +16,11 @@ function Navigation() {
               <li>
                 <a href="/leaderboard">Leaderboard</a>
               </li>
-              <a href="/account" className="account">Account</a>
+              <a href="/account" className="account">
+                Account
+              </a>
               <li>
-                <ButtonLogOut/>
+                <ButtonLogOut />
               </li>
             </ul>
           </div>

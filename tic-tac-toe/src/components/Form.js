@@ -1,8 +1,10 @@
 import ButtonSignIn from "./ButtonSignIn";
+import { useNavigate } from "react-router-dom";
 import { saveUserToStorage } from "../helper";
 import { useState } from "react";
 
 function Form() {
+  const navigate = useNavigate();
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ nickname: "", password: "" });
@@ -12,17 +14,24 @@ function Form() {
 
     if (nickname.length < 4) {
       newErrors.nickname = "Nickname must be at least 4 characters";
+    } else if (nickname.length > 12) {
+      newErrors.nickname = "Nickname must be max 12 characters"; // ← ОШИБКА
     }
 
     if (password.length < 5) {
       newErrors.password = "Password must be at least 5 characters";
+    } else if (password.length > 20) {
+      newErrors.password = "Password must be max 20 characters";
+    }
+
+    if (!newErrors.nickname && !newErrors.password) {
+      const result = saveUserToStorage(nickname, password, navigate);
+      if (!result.success) {
+        newErrors.password = result.password;
+      }
     }
 
     setErrors(newErrors);
-
-    if (!newErrors.nickname && !newErrors.password) {
-      saveUserToStorage(nickname,password);
-    }
     return newErrors;
   }
 
@@ -38,9 +47,10 @@ function Form() {
             id="nick"
             name="nick"
             type="text"
-            minLength={5}
+            minLength={4}
             required
             value={nickname}
+            maxLength={12}
             onChange={(e) => setNickname(e.target.value)}
           />
           {errors.nickname ? (
@@ -57,6 +67,7 @@ function Form() {
             minLength={5}
             required
             value={password}
+            maxLength={20}
             onChange={(e) => setPassword(e.target.value)}
           />
           {errors.password ? (

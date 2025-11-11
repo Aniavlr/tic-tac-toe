@@ -59,7 +59,7 @@ export function updateLeaderboard(playerName, result) {
   localStorage.setItem("TicTacToeLeaderboard", JSON.stringify(leaderboard));
 }
 
-export function saveUserToStorage(nickname, password) {
+export function saveUserToStorage(nickname, password, navigate) {
   const existingUsers = JSON.parse(
     localStorage.getItem("registeredUsers") || "[]"
   );
@@ -75,11 +75,11 @@ export function saveUserToStorage(nickname, password) {
           registeredAt: userExists.registeredAt,
         })
       );
-      window.location.href = "/game";
+      navigate("/game");
+      return { success: true };
     } else {
-      alert("Wrong password!");
+      return { success: false, password: "Wrong password!" };
     }
-    return;
   }
   const newUser = {
     id: Date.now(),
@@ -101,6 +101,5 @@ export function saveUserToStorage(nickname, password) {
       registeredAt: newUser.registeredAt,
     })
   );
-
-  window.location.href = "/game";
+  navigate("/game");
 }
