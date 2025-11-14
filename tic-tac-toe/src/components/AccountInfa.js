@@ -70,6 +70,10 @@ function AccountInfa() {
             ) : null}
           </div>
         </div>
+
+        <div className="history">
+            <a href="/history">History of games</a>
+        </div>
       </div>
     </>
   );

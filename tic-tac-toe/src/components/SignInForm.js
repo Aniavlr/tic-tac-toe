@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { saveUserToStorage } from "../helper";
 import { useState } from "react";
 
-function Form() {
+function SignInFormForm() {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
@@ -82,4 +82,4 @@ function Form() {
   );
 }
 
-export default Form;
+export default SignInFormForm;

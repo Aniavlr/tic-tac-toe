@@ -3,6 +3,7 @@ import GamePage from "./pages/GamePage";
 import LoginPage from "./pages/LoginPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import AccountPage from "./pages/AccountPage";
+import HistoryPage from "./pages/HistoryPage";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/game" element={<GamePage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/account" element={<AccountPage />} />
+        <Route path="/history" element={<HistoryPage />} />
       </Routes>
     </Router>
   );
