@@ -59,7 +59,7 @@ export function updateLeaderboard(playerName, result) {
   localStorage.setItem("TicTacToeLeaderboard", JSON.stringify(leaderboard));
 }
 
-export function saveUserToStorage(nickname, password, navigate) {
+export function loginUser(nickname, password, navigate) {
   const existingUsers = JSON.parse(
     localStorage.getItem("registeredUsers") || "[]"
   );
@@ -81,6 +81,19 @@ export function saveUserToStorage(nickname, password, navigate) {
       return { success: false, password: "Wrong password!" };
     }
   }
+  return { success: false, nickname: "User not found!" };
+}
+
+export function registerUser(nickname, password, navigate) {
+  const existingUsers = JSON.parse(
+    localStorage.getItem("registeredUsers") || "[]"
+  );
+
+  const userExists = existingUsers.find((user) => user.nickname === nickname);
+  if (userExists) {
+    return { success: false, nickname: "User already exists!" };
+  }
+
   const newUser = {
     id: Date.now(),
     nickname: nickname,
@@ -102,4 +115,5 @@ export function saveUserToStorage(nickname, password, navigate) {
     })
   );
   navigate("/game");
+  return { success: true };
 }

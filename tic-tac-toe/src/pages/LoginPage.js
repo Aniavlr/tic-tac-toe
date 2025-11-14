@@ -1,4 +1,4 @@
-import SignInForm from "../components/SignInForm";
+import Form from "../components/Form";
 
 function LoginPage() {
   return (
@@ -7,7 +7,7 @@ function LoginPage() {
         <div className="login-header">
           <h1>Let's Play Tic-Tac-Toe</h1>
         </div>
-        <SignInForm/>
+        <Form />
       </div>
     </>
   );
