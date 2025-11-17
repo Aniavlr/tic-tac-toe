@@ -1,72 +1,300 @@
 import ButtonSignIn from "./ButtonSignIn";
 import ButtonRegister from "./ButtonRegister";
 import { useNavigate } from "react-router-dom";
-import { loginUser, registerUser } from "../helper";
 import { useState } from "react";
+import { auth } from "../firebase";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  sendEmailVerification,
+} from "firebase/auth";
+
+const EmailVerificationToast = ({ email, onClose }) => {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundColor: "rgba(0, 0, 0, 0.6)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 9999,
+        backdropFilter: "blur(4px)",
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "#1a1a2e",
+          color: "white",
+          padding: "24px",
+          borderRadius: "12px",
+          maxWidth: "400px",
+          width: "90%",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+          border: "1px solid #16213e",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "16px",
+          }}
+        >
+          <h3 style={{ margin: 0, fontSize: "20px" }}>
+            ✅ Registration Successful!
+          </h3>
+          <button
+            onClick={onClose}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#aaa",
+              fontSize: "28px",
+              cursor: "pointer",
+              padding: "0 4px",
+            }}
+          >
+            ×
+          </button>
+        </div>
+
+        <p style={{ margin: "12px 0", opacity: 0.9 }}>
+          We've sent a verification link to:
+        </p>
+        <p
+          style={{
+            margin: "8px 0",
+            fontWeight: "bold",
+            fontSize: "16px",
+            wordBreak: "break-all",
+          }}
+        >
+          {email}
+        </p>
+        <p style={{ margin: "12px 0", opacity: 0.9 }}>
+          Please check your inbox (and spam folder) and verify your email.
+        </p>
+
+        <div style={{ marginTop: "24px", textAlign: "center" }}>
+          <button
+            onClick={onClose}
+            style={{
+              backgroundColor: "#00d4ff",
+              color: "black",
+              border: "none",
+              padding: "12px 24px",
+              borderRadius: "8px",
+              fontSize: "16px",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Continue to Game
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function Form() {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({ nickname: "", password: "" });
+  const [email, setEmail] = useState("");
+  const [errors, setErrors] = useState({
+    nickname: "",
+    email: "",
+    password: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const [isLoginForm, setIsLoginForm] = useState(true);
+  const [showVerificationToast, setShowVerificationToast] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState("");
 
-  function validateLogin() {
-    const newErrors = { nickname: "", password: "" };
+  const firebaseLogin = async (email, password) => {
+    try {
+      setIsLoading(true);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
 
-    if (nickname.length < 4) {
-      newErrors.nickname = "Nickname must be at least 4 characters";
-    } else if (nickname.length > 12) {
-      newErrors.nickname = "Nickname must be max 12 characters"; // ← ОШИБКА
+      if (!user.emailVerified) {
+        setErrors({ email: "Please verify your email first" });
+        return;
+      }
+
+      const displayName = user.displayName || "Guest";
+
+      localStorage.setItem(
+        "currentUser",
+        JSON.stringify({
+          nickname: displayName,
+          email: user.email,
+          isLoggedIn: true,
+          registeredAt: new Date().toISOString(),
+          uid: user.uid,
+          emailVerified: user.emailVerified,
+        })
+      );
+
+      navigate("/game");
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        password: getFirebaseErrorMessage(error.code),
+      };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const firebaseRegister = async (nickname, email, password) => {
+    try {
+      setIsLoading(true);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      await updateProfile(user, {
+        displayName: nickname,
+      });
+
+      await sendEmailVerification(user);
+
+      localStorage.setItem(
+        "currentUser",
+        JSON.stringify({
+          nickname: nickname,
+          email: user.email,
+          isLoggedIn: true,
+          registeredAt: new Date().toISOString(),
+          uid: user.uid,
+          emailVerified: false, // Пока не подтвержден
+        })
+      );
+
+      setVerificationEmail(email);
+      setShowVerificationToast(true);
+
+      return { success: true };
+    } catch (error) {
+      console.error("Firebase register error:", error);
+      return {
+        success: false,
+        email: getFirebaseErrorMessage(error.code),
+      };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getFirebaseErrorMessage = (errorCode) => {
+    const errorMessages = {
+      "auth/invalid-email": "Invalid email address",
+      "auth/user-disabled": "This account has been disabled",
+      "auth/user-not-found": "No account found with this email",
+      "auth/wrong-password": "Incorrect password",
+      "auth/email-already-in-use": "Email already registered",
+      "auth/weak-password": "Password should be at least 6 characters",
+      "auth/too-many-requests": "Too many attempts, try again later",
+      "auth/network-request-failed": "Network error, check your connection",
+    };
+    return errorMessages[errorCode] || "Authentication failed";
+  };
+
+  const validateLogin = async () => {
+    const newErrors = { nickname: "", email: "", password: "" };
+    let isValid = true;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      newErrors.email = "Please enter a valid email address";
+      isValid = false;
     }
 
-    if (password.length < 5) {
-      newErrors.password = "Password must be at least 5 characters";
+    if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+      isValid = false;
     } else if (password.length > 20) {
       newErrors.password = "Password must be max 20 characters";
-    }
-
-    if (!newErrors.nickname && !newErrors.password) {
-      const result = loginUser(nickname, password, navigate);
-      if (!result.success) {
-        if (result.password) newErrors.password = result.password;
-        if (result.nickname) newErrors.nickname = result.nickname;
-      }
+      isValid = false;
     }
 
     setErrors(newErrors);
-    return newErrors;
-  }
 
-  function validateRegister() {
-    const newErrors = { nickname: "", password: "" };
+    if (isValid) {
+      const result = await firebaseLogin(email, password);
+      if (!result || !result.success) {
+        if (result?.email) {
+          newErrors.email = result.email;
+        }
+        setErrors(newErrors);
+      }
+    }
+  };
+
+  const validateRegister = async () => {
+    const newErrors = { nickname: "", email: "", password: "" };
+    let isValid = true;
 
     if (nickname.length < 4) {
       newErrors.nickname = "Nickname must be at least 4 characters";
+      isValid = false;
     } else if (nickname.length > 12) {
       newErrors.nickname = "Nickname must be max 12 characters";
+      isValid = false;
     }
 
-    if (password.length < 5) {
-      newErrors.password = "Password must be at least 5 characters";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      newErrors.email = "Please enter a valid email address";
+      isValid = false;
+    }
+
+    if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+      isValid = false;
     } else if (password.length > 20) {
       newErrors.password = "Password must be max 20 characters";
-    }
-
-    if (!newErrors.nickname && !newErrors.password) {
-      const result = registerUser(nickname, password, navigate);
-      if (!result.success) {
-        if (result.nickname) newErrors.nickname = result.nickname;
-      }
+      isValid = false;
     }
 
     setErrors(newErrors);
-    return newErrors;
-  }
+
+    if (isValid) {
+      const result = await firebaseRegister(nickname, email, password);
+      if (!result || !result.success) {
+        if (result?.email) {
+          newErrors.email = result.email;
+        }
+        setErrors(newErrors);
+      }
+    }
+  };
 
   const toggleForm = () => {
     setIsLoginForm(!isLoginForm);
-    setErrors({ nickname: "", password: "" }); // Очищаем ошибки при переключении
+    setErrors({ nickname: "", email: "", password: "" }); // Очищаем ошибки при переключении
+  };
+
+  const handleToastClose = () => {
+    setShowVerificationToast(false);
+    navigate("/game");
   };
 
   return (
@@ -75,22 +303,22 @@ function Form() {
         <h1 className="headerForm">
           {isLoginForm ? "Enter the Game" : "Create Account"}
         </h1>
+        {isLoading && <div className="loading">Loading...</div>}
         <form className={`signInForm ${isLoginForm ? "active" : "hidden"}`}>
           <div className="input-group">
-            <label htmlFor="nick-login">Nickname</label>
+            <label htmlFor="email-login">Email</label>
             <input
               className="input"
-              id="nick-login"
-              name="nick"
-              type="text"
-              minLength={4}
+              id="email-login"
+              name="email"
+              type="email"
+              placeholder="your@email.com"
               required
-              value={nickname}
-              maxLength={12}
-              onChange={(e) => setNickname(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-            {errors.nickname ? (
-              <span className="error-message">{errors.nickname}</span>
+            {errors.email ? (
+              <span className="error-message">{errors.email}</span>
             ) : null}
           </div>
           <div className="input-group">
@@ -100,7 +328,7 @@ function Form() {
               id="password-login"
               name="password"
               type="password"
-              minLength={5}
+              minLength={6}
               required
               value={password}
               maxLength={20}
@@ -111,7 +339,7 @@ function Form() {
             ) : null}
           </div>
           <div className="buttonContainer">
-            <ButtonSignIn onValidation={validateLogin} />
+            <ButtonSignIn onValidation={validateLogin} disabled={isLoading} />
           </div>
           <div className="form-switch">
             <p>
@@ -132,6 +360,7 @@ function Form() {
               name="nick"
               type="text"
               minLength={4}
+              placeholder="4-12 characters"
               required
               value={nickname}
               maxLength={12}
@@ -142,13 +371,29 @@ function Form() {
             ) : null}
           </div>
           <div className="input-group">
+            <label htmlFor="email-register">Email</label>
+            <input
+              className="input"
+              id="email-register"
+              name="email"
+              type="email"
+              placeholder="your@email.com"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            {errors.email ? (
+              <span className="error-message">{errors.email}</span>
+            ) : null}
+          </div>
+          <div className="input-group">
             <label htmlFor="password-register">Password</label>
             <input
               className="input"
               id="password-register"
               name="password"
               type="password"
-              minLength={5}
+              minLength={6}
               required
               value={password}
               maxLength={20}
@@ -159,10 +404,20 @@ function Form() {
             ) : null}
           </div>
           <div className="buttonContainer">
-            <ButtonRegister onValidation={validateRegister} />
+            <ButtonRegister
+              onValidation={validateRegister}
+              disabled={isLoading}
+            />
           </div>
         </form>
       </div>
+
+      {showVerificationToast && (
+        <EmailVerificationToast
+          email={verificationEmail}
+          onClose={handleToastClose}
+        />
+      )}
     </>
   );
 }

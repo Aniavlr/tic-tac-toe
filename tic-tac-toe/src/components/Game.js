@@ -1,26 +1,33 @@
 import { useState, useEffect } from "react";
 import Board from "./Board";
-import {calculateWinner, updateLeaderboard} from "../helper";
+import { calculateWinner, updateLeaderboard } from "../helper";
+import { auth } from "../firebase";
 
 function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
   const [isBotThinking, setIsBotThinking] = useState(false);
-  const[nickname, setNickname] = useState("");
+  const [nickname, setNickname] = useState("");
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
 
-   useEffect(() => {
-    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-    const storedNickname = currentUser.nickname;
-    
-    if (storedNickname) {
-      setNickname(storedNickname);
-    } else {
-      // Если пользователь не найден, можно показать форму входа
-      console.warn("No user found in localStorage");
-      setNickname("Guest");
-    }
+  useEffect(() => {
+    const loadUser = async () => {
+      if (auth.currentUser) {
+        await auth.currentUser.reload();
+        const displayName = auth.currentUser.displayName;
+        if (displayName) {
+          setNickname(displayName);
+          return;
+        }
+      }
+      const saved = JSON.parse(localStorage.getItem("currentUser") || "{}");
+      if (saved.nickname && saved.nickname !== "Guest") {
+        setNickname(saved.nickname);
+      }
+    };
+
+    loadUser();
   }, []);
 
   function handlePlay(nextSquares) {
@@ -33,8 +40,8 @@ function Game() {
 
     const winner = calculateWinner(nextSquares);
     const isDraw = !winner && !nextSquares.includes(null);
-    
-    if (winner === 'X') {
+
+    if (winner === "X") {
       updateLeaderboard(nickname, "win");
     } else if (isDraw) {
       updateLeaderboard(nickname, "draw");
@@ -58,7 +65,7 @@ function Game() {
           setIsBotThinking(false);
 
           const botWinner = calculateWinner(botSquares);
-          if (botWinner === 'O') {
+          if (botWinner === "O") {
             updateLeaderboard(nickname, "loss");
           }
         }, 400);
@@ -95,7 +102,7 @@ function Game() {
             squares={currentSquares}
             onPlay={handlePlay}
             isBotThinking={isBotThinking}
-            nickname ={nickname}
+            nickname={nickname}
           />
         </div>
         <div className="game-info">

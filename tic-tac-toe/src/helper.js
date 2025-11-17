@@ -1,3 +1,14 @@
+import { db } from "./firebase";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  increment,
+  serverTimestamp,
+} from "firebase/firestore";
+import { auth } from "./firebase";
+
 export function calculateWinner(squares) {
   const lines = [
     [0, 1, 2],
@@ -18,102 +29,39 @@ export function calculateWinner(squares) {
   return null;
 }
 
-export function updateLeaderboard(playerName, result) {
-  const leaderboard =
-    JSON.parse(localStorage.getItem("TicTacToeLeaderboard")) || [];
+export const updateLeaderboard = async (nickname, result) => {
+  if (!nickname || nickname === "Guest" || !auth.currentUser) return;
 
-  let playerIndex = leaderboard.findIndex((p) => p.name === playerName);
-  if (playerIndex === -1) {
-    playerIndex = leaderboard.length;
-    leaderboard.push({
-      id: Date.now(),
-      name: playerName,
-      score: 0,
-      totalGames: 0,
-      wins: 0,
-      losses: 0,
-      draws: 0,
-    });
-  }
-  const player = leaderboard[playerIndex];
+  const userRef = doc(db, "users", auth.currentUser.uid);
 
-  player.totalGames++;
+  try {
+    const userSnap = await getDoc(userRef);
 
-  switch (result) {
-    case "win":
-      player.wins++;
-      player.score += 30;
-      break;
-    case "loss":
-      player.losses++;
-      player.score -= 10;
-      break;
-    case "draw":
-      player.draws++;
-      player.score += 5;
-      break;
-    default:
-    //
-  }
-
-  localStorage.setItem("TicTacToeLeaderboard", JSON.stringify(leaderboard));
-}
-
-export function loginUser(nickname, password, navigate) {
-  const existingUsers = JSON.parse(
-    localStorage.getItem("registeredUsers") || "[]"
-  );
-
-  const userExists = existingUsers.find((user) => user.nickname === nickname);
-  if (userExists) {
-    if (userExists.password === password) {
-      localStorage.setItem(
-        "currentUser",
-        JSON.stringify({
-          nickname: nickname,
-          isLoggedIn: true,
-          registeredAt: userExists.registeredAt,
-        })
-      );
-      navigate("/game");
-      return { success: true };
+    if (userSnap.exists()) {
+      // Пользователь есть — обновляем счётчики
+      await updateDoc(userRef, {
+        totalGames: increment(1),
+        wins: result === "win" ? increment(1) : increment(0),
+        losses: result === "loss" ? increment(1) : increment(0),
+        draws: result === "draw" ? increment(1) : increment(0),
+        score: increment(result === "win" ? 3 : result === "draw" ? 1 : 0),
+        nickname: nickname,
+        lastPlayed: serverTimestamp(),
+      });
     } else {
-      return { success: false, password: "Wrong password!" };
+      // Первый раз — создаём профиль
+      await setDoc(userRef, {
+        nickname: nickname,
+        totalGames: 1,
+        wins: result === "win" ? 1 : 0,
+        losses: result === "loss" ? 1 : 0,
+        draws: result === "draw" ? 1 : 0,
+        score: result === "win" ? 3 : result === "draw" ? 1 : 0,
+        createdAt: serverTimestamp(), // ← ИСПРАВЛЕНО!
+        lastPlayed: serverTimestamp(),
+      });
     }
+  } catch (error) {
+    console.error("Leaderboard update error:", error);
   }
-  return { success: false, nickname: "User not found!" };
-}
-
-export function registerUser(nickname, password, navigate) {
-  const existingUsers = JSON.parse(
-    localStorage.getItem("registeredUsers") || "[]"
-  );
-
-  const userExists = existingUsers.find((user) => user.nickname === nickname);
-  if (userExists) {
-    return { success: false, nickname: "User already exists!" };
-  }
-
-  const newUser = {
-    id: Date.now(),
-    nickname: nickname,
-    password: password,
-    registeredAt: new Date().toISOString(),
-  };
-
-  existingUsers.push(newUser);
-
-  localStorage.setItem("registeredUsers", JSON.stringify(existingUsers));
-
-  localStorage.setItem(
-    "currentUser",
-    JSON.stringify({
-      id: newUser.id,
-      nickname: nickname,
-      isLoggedIn: true,
-      registeredAt: newUser.registeredAt,
-    })
-  );
-  navigate("/game");
-  return { success: true };
-}
+};

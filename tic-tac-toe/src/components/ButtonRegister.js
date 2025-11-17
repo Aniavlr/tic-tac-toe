@@ -1,10 +1,13 @@
-function ButtonRegister({ onValidation }) {
-  function onSignInClick() {
-    onValidation();
+function ButtonRegister({ onValidation}) {
+  const handleClick = async (e) => {
+    e.preventDefault();           // ← КРИТИЧНО!
+    if (onValidation) {
+      await onValidation();       // ← ждём завершения
+    }
   }
 
   return (
-    <button className="buttonRegister" onClick={onSignInClick}>
+    <button className="buttonRegister" onClick={handleClick}>
       Registration
     </button>
   );

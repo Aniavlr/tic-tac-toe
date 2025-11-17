@@ -1,10 +1,13 @@
 function ButtonSignIn({ onValidation }) {
-  function onSignInClick(e) {
-    onValidation(e);
-  }
+  const handleClick = async (e) => {
+    e.preventDefault();
+    if (onValidation) {
+      await onValidation();
+    }
+  };
 
   return (
-    <button className="buttonSignIn" onClick={onSignInClick} type="button">
+    <button className="buttonSignIn" onClick={handleClick} type="button">
       Sign in
     </button>
   );
