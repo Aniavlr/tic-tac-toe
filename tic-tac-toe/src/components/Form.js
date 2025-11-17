@@ -303,7 +303,12 @@ function Form() {
         <h1 className="headerForm">
           {isLoginForm ? "Enter the Game" : "Create Account"}
         </h1>
-        {isLoading && <div className="loading">Loading...</div>}
+        {isLoading && (
+          <div className="loading-overlay">
+            <div className="loading-spinner"></div>
+            <div className="loading-text">Loading...</div>
+          </div>
+        )}
         <form className={`signInForm ${isLoginForm ? "active" : "hidden"}`}>
           <div className="input-group">
             <label htmlFor="email-login">Email</label>

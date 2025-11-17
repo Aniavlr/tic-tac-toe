@@ -54,7 +54,10 @@ function Leaderboard() {
     return (
       <div className="leaderboard">
         <h2>🏆 Leaderboard</h2>
-        <p>Loading leaderboard...</p>
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+          <div className="loading-text">Loading leaderboard...</div>
+        </div>
       </div>
     );
   }

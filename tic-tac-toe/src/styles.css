@@ -698,6 +698,90 @@ label {
   color: #0056b3;
 }
 
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(56, 178, 172, 0.2);
+  border-top: 3px solid #38b2ac;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+.loading-text {
+  text-align: center;
+  color: #38b2ac;
+  font-weight: 600;
+  font-size: 16px;
+  background: rgba(56, 178, 172, 0.1);
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(56, 178, 172, 0.2);
+}
+
+/* Для Form компонента */
+.form-container {
+  position: relative; /* Добавляем для абсолютного позиционирования */
+}
+
+/* Для AccountInfo компонента */
+.container {
+  position: relative; /* Добавляем для абсолютного позиционирования */
+  min-height: 650px; /* Минимальная высота для контейнера */
+}
+
+/* Для Leaderboard компонента */
+.leaderboard {
+  position: relative; /* Добавляем для абсолютного позиционирования */
+  min-height: 300px; /* Минимальная высота для таблицы */
+}
+
+/* Анимации */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Убираем старые стили loading */
+.loading-container {
+  display: none;
+}
+
+.loading {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .login-header h1 {
     font-size: 40px;
