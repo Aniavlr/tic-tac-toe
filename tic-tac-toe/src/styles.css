@@ -680,7 +680,6 @@ label {
   transform: translateY(20px);
 }
 
-/* Стили для ссылки переключения */
 .form-switch {
   text-align: center;
   margin-top: 20px;
@@ -735,21 +734,18 @@ label {
   border: 1px solid rgba(56, 178, 172, 0.2);
 }
 
-/* Для Form компонента */
 .form-container {
-  position: relative; /* Добавляем для абсолютного позиционирования */
+  position: relative;
 }
 
-/* Для AccountInfo компонента */
 .container {
-  position: relative; /* Добавляем для абсолютного позиционирования */
-  min-height: 650px; /* Минимальная высота для контейнера */
+  position: relative;
+  min-height: 650px;
 }
 
-/* Для Leaderboard компонента */
 .leaderboard {
-  position: relative; /* Добавляем для абсолютного позиционирования */
-  min-height: 300px; /* Минимальная высота для таблицы */
+  position: relative;
+  min-height: 300px;
 }
 
 /* Анимации */
@@ -780,6 +776,82 @@ label {
 
 .loading {
   display: none;
+}
+
+.history-wrap {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 212, 59, 0.2);
+  max-width: 900px;
+  width: 100%;
+  margin: 20px auto;
+  position: relative;
+  min-height: 500px;
+}
+
+.history-wrap h2 {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 36px;
+  text-align: center;
+  margin-bottom: 30px;
+  background: linear-gradient(135deg, #38b2ac, #ffd43b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.history-table thead {
+  background: linear-gradient(135deg, #ffd43b, #fab005);
+}
+
+.history-table th {
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 16px;
+}
+
+.history-table td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 15px;
+}
+
+.history-table tbody tr:hover {
+  background: #fffbe6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 212, 59, 0.2);
+}
+
+.result.win {
+  color: #51cf66;
+}
+.result.loss {
+  color: #ff6b6b;
+}
+.result.draw {
+  color: #ffa94d;
+}
+
+.auth-message,
+.empty-message {
+  text-align: center;
+  font-size: 18px;
+  color: #4a5568;
+  margin-top: 40px;
 }
 
 @media (max-width: 768px) {

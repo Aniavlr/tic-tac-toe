@@ -6,6 +6,8 @@ import {
   updateDoc,
   increment,
   serverTimestamp,
+  collection,
+  addDoc,
 } from "firebase/firestore";
 import { auth } from "./firebase";
 
@@ -44,7 +46,7 @@ export const updateLeaderboard = async (nickname, result) => {
         wins: result === "win" ? increment(1) : increment(0),
         losses: result === "loss" ? increment(1) : increment(0),
         draws: result === "draw" ? increment(1) : increment(0),
-        score: increment(result === "win" ? 3 : result === "draw" ? 1 : 0),
+        score: increment(result === "win" ? 10 : result === "draw" ? 5 : -5),
         nickname: nickname,
         lastPlayed: serverTimestamp(),
       });
@@ -57,11 +59,28 @@ export const updateLeaderboard = async (nickname, result) => {
         losses: result === "loss" ? 1 : 0,
         draws: result === "draw" ? 1 : 0,
         score: result === "win" ? 3 : result === "draw" ? 1 : 0,
-        createdAt: serverTimestamp(), // ← ИСПРАВЛЕНО!
+        createdAt: serverTimestamp(),
         lastPlayed: serverTimestamp(),
       });
     }
   } catch (error) {
     console.error("Leaderboard update error:", error);
+  }
+};
+
+export const saveGameToHistory = async (player1, player2, winnerUid) => {
+  try {
+    await addDoc(collection(db, "gameHistory"), {
+      players: [
+        { uid: player1.uid, nickname: player1.nickname },
+        { uid: player2.uid, nickname: player2.nickname },
+      ],
+      playerIds: [player1.uid, player2.uid],
+      winner: winnerUid === "bot" ? "bot" : winnerUid,
+      endedAt: serverTimestamp(),
+      endedAtMs: Date.now(),
+    });
+  } catch (e) {
+    console.error("Ошибка сохранения игры:", e);
   }
 };

@@ -184,7 +184,7 @@ function Form() {
           isLoggedIn: true,
           registeredAt: new Date().toISOString(),
           uid: user.uid,
-          emailVerified: false, // Пока не подтвержден
+          emailVerified: false,
         })
       );
 

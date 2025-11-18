@@ -41,7 +41,7 @@ function Leaderboard() {
         }
       } catch (error) {
         console.error("❌ Leaderboard: Error", error);
-        setTopPlayers([]); // В случае ошибки — пустой массив
+        setTopPlayers([]);
       } finally {
         setLoading(false); // Теперь loading=false только после всего
       }

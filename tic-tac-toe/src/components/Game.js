@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import Board from "./Board";
-import { calculateWinner, updateLeaderboard } from "../helper";
+import {
+  calculateWinner,
+  updateLeaderboard,
+  saveGameToHistory,
+} from "../helper";
 import { auth } from "../firebase";
 
 function Game() {
@@ -41,6 +45,17 @@ function Game() {
     const winner = calculateWinner(nextSquares);
     const isDraw = !winner && !nextSquares.includes(null);
 
+    if (winner || isDraw) {
+      // игра закончена
+      const uid = auth.currentUser?.uid || "anon";
+      const nick = nickname || "Guest";
+      saveGameToHistory(
+        { uid, nickname: nick }, // игрок
+        { uid: "bot", nickname: "Bot" }, // противник
+        winner === "X" ? uid : winner === "O" ? "bot" : null
+      );
+    }
+
     if (winner === "X") {
       updateLeaderboard(nickname, "win");
     } else if (isDraw) {
@@ -67,6 +82,25 @@ function Game() {
           const botWinner = calculateWinner(botSquares);
           if (botWinner === "O") {
             updateLeaderboard(nickname, "loss");
+
+            if (auth.currentUser) {
+              saveGameToHistory(
+                { uid: auth.currentUser.uid, nickname: nickname || "Guest" },
+                { uid: "bot", nickname: "Bot" },
+                "bot"
+              );
+            }
+          }
+
+          if (!botWinner && !botSquares.includes(null)) {
+            updateLeaderboard(nickname, "draw");
+            if (auth.currentUser) {
+              saveGameToHistory(
+                { uid: auth.currentUser.uid, nickname: nickname || "Guest" },
+                { uid: "bot", nickname: "Bot" },
+                null
+              );
+            }
           }
         }, 400);
       }

@@ -68,7 +68,7 @@ function AccountInfa() {
               if (typeof data.createdAt.toDate === "function") {
                 registeredAt = data.createdAt.toDate();
               }
-              // Если createdAt - это строка (ваш случай)
+              // Если createdAt - это строка
               else if (typeof data.createdAt === "string") {
                 registeredAt = new Date(data.createdAt);
               }
