@@ -14,6 +14,7 @@ function Game() {
   const [nickname, setNickname] = useState("");
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
+  const [isLoadingNickname, setIsLoadingNickname] = useState(true);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -22,12 +23,14 @@ function Game() {
         const displayName = auth.currentUser.displayName;
         if (displayName) {
           setNickname(displayName);
+          setIsLoadingNickname(false);
           return;
         }
       }
       const saved = JSON.parse(localStorage.getItem("currentUser") || "{}");
       if (saved.nickname && saved.nickname !== "Guest") {
         setNickname(saved.nickname);
+        setIsLoadingNickname(false);
       }
     };
 
@@ -137,6 +140,7 @@ function Game() {
             onPlay={handlePlay}
             isBotThinking={isBotThinking}
             nickname={nickname}
+            isLoadingNickname={isLoadingNickname}
           />
         </div>
         <div className="game-info">

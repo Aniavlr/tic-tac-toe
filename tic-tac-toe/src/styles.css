@@ -1316,6 +1316,22 @@ label {
   border: 1px solid #a0aec0;
 }
 
+
+
+/* Disabled state for squares during loading */
+.square:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.square:disabled:hover {
+  background: #ffffff;
+  border-color: #a0d8d4;
+  transform: none !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
 @media (max-width: 768px) {
   .login-header h1 {
     font-size: 40px;
