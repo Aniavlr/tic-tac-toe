@@ -45,7 +45,8 @@ function Game() {
     const newMove = nextHistory.length - 1;
     setCurrentMove(newMove);
 
-    const winner = calculateWinner(nextSquares);
+    const winnerInfo = calculateWinner(nextSquares);
+    const winner = winnerInfo ? winnerInfo.winner : null;
     const isDraw = !winner && !nextSquares.includes(null);
 
     if (winner || isDraw) {
@@ -66,7 +67,9 @@ function Game() {
     }
 
     if (wasXTurn) {
-      const winner = calculateWinner(nextSquares);
+      const winnerInfo = calculateWinner(nextSquares);
+      const winner = winnerInfo ? winnerInfo.winner : null;
+
       if (!winner && nextSquares.includes(null)) {
         setIsBotThinking(true);
         setTimeout(() => {
@@ -82,7 +85,8 @@ function Game() {
           setCurrentMove(botHistory.length - 1);
           setIsBotThinking(false);
 
-          const botWinner = calculateWinner(botSquares);
+          const botWinnerInfo = calculateWinner(botSquares);
+          const botWinner = botWinnerInfo ? botWinnerInfo.winner : null;
           if (botWinner === "O") {
             updateLeaderboard(nickname, "loss");
 

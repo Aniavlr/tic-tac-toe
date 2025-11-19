@@ -432,8 +432,6 @@ function AdminPanel() {
                                 ? "winner-bot"
                                 : playerInfo.winner === playerInfo.playerX
                                 ? "winner-x"
-                                : playerInfo.winner === playerInfo.playerO
-                                ? "winner-o"
                                 : "winner-draw"
                             }`}
                           >

@@ -103,6 +103,30 @@ ul {
   font-weight: 700;
 }
 
+/* Подсветка выигрышных клеток */
+.square.winning {
+  background: linear-gradient(135deg, #fffbe6, #ffec99);
+  border-color: #ffd43b;
+  box-shadow: 0 0 20px rgba(255, 212, 59, 0.6);
+  transform: scale(1.05);
+  z-index: 1;
+  position: relative;
+}
+
+.square.winning.x {
+  background: linear-gradient(135deg, #e6f7f6, #b2ebf2);
+  border-color: #38b2ac;
+  box-shadow: 0 0 20px rgba(56, 178, 172, 0.6);
+  color: #2c7873;
+}
+
+.square.winning.o {
+  background: linear-gradient(135deg, #fff9e6, #ffe066);
+  border-color: #ffd43b;
+  box-shadow: 0 0 20px rgba(255, 212, 59, 0.6);
+  color: #d4b030;
+}
+
 .board-row:after {
   clear: both;
   content: "";
@@ -1298,12 +1322,6 @@ label {
   border: 1px solid #38b2ac;
 }
 
-.winner-o {
-  background: linear-gradient(135deg, #ffd43b20, #ffd43b40);
-  color: #d4b030;
-  border: 1px solid #ffd43b;
-}
-
 .winner-bot {
   background: linear-gradient(135deg, #ff6b6b20, #ff6b6b40);
   color: #c4453a;
@@ -1391,14 +1409,14 @@ label {
   }
 
   .admin-header h2 {
-  font-size: 20px;
-}
-.games-count {
-  font-size: 12px;
-}
+    font-size: 20px;
+  }
+  .games-count {
+    font-size: 12px;
+  }
 
-.admin-logout-btn {
-  font-weight: 550;
-  font-size: 12px;
-}
+  .admin-logout-btn {
+    font-weight: 550;
+    font-size: 12px;
+  }
 }
