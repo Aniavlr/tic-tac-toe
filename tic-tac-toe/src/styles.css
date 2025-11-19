@@ -1316,9 +1316,6 @@ label {
   border: 1px solid #a0aec0;
 }
 
-
-
-/* Disabled state for squares during loading */
 .square:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -1392,4 +1389,16 @@ label {
     overflow-x: auto;
     overflow-y: auto;
   }
+
+  .admin-header h2 {
+  font-size: 20px;
+}
+.games-count {
+  font-size: 12px;
+}
+
+.admin-logout-btn {
+  font-weight: 550;
+  font-size: 12px;
+}
 }
