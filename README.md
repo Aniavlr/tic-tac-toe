@@ -1,6 +1,5 @@
 # Tic-Tac-Toe Game with Firebase
 
-
 A modern, full-featured **Tic-Tac-Toe** web application built with **React** and **Firebase**. Features authentication, real-time leaderboard, game history, user profiles, and bot opponent.
 
 <!-- Live Demo: [https://your-app-url.firebaseapp.com](https://your-app-url.firebaseapp.com) *(update after deploy)* -->
@@ -17,6 +16,7 @@ A modern, full-featured **Tic-Tac-Toe** web application built with **React** and
 - Loading states
 
 **Scoring system:**
+
 - Win → +10 points
 - Draw → +5 points
 - Loss → -5 points
@@ -31,5 +31,4 @@ A modern, full-featured **Tic-Tac-Toe** web application built with **React** and
 
 ## License
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+MIT License — free to use, modify, and distribute.
