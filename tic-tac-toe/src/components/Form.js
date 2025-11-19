@@ -297,6 +297,10 @@ function Form() {
     navigate("/game");
   };
 
+  const handleAdminLogin = () => {
+    navigate("/admin");
+  };
+
   return (
     <>
       <div className="form-container">
@@ -353,6 +357,20 @@ function Form() {
                 Create one
               </span>
             </p>
+          </div>
+
+          <div className="admin-access">
+            <div className="admin-divider">
+              <span>Admin Access</span>
+            </div>
+            <button
+              type="button"
+              className="admin-link"
+              onClick={handleAdminLogin}
+            >
+              <span className="admin-icon">⚙️</span>
+              Admin Panel
+            </button>
           </div>
         </form>
 

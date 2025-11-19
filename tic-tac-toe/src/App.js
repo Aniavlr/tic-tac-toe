@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import AccountPage from "./pages/AccountPage";
 import HistoryPage from "./pages/HistoryPage";
+import AdminPage from "./pages/AdminPage";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/history" element={<HistoryPage />} />
+        <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </Router>
   );
