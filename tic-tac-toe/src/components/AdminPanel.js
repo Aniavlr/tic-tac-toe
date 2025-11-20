@@ -311,7 +311,7 @@ function AdminPanel() {
                 className="input"
                 id="admin-email"
                 type="email"
-                placeholder="admin@mytictactoe.com"
+                placeholder="admin@email.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

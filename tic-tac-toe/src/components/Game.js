@@ -76,6 +76,46 @@ function Game() {
           const availableMoves = nextSquares
             .map((square, index) => (square === null ? index : null))
             .filter((index) => index !== null);
+
+          // 1. Проверяем — может бот сразу выиграть?
+          for (let i of availableMoves) {
+            const test = [...nextSquares];
+            test[i] = "O";
+            if (calculateWinner(test)?.winner === "O") {
+              const botSquares = test;
+              const botHistory = [...nextHistory, botSquares];
+              setHistory(botHistory);
+              setCurrentMove(botHistory.length - 1);
+              setIsBotThinking(false);
+
+              updateLeaderboard(nickname, "loss");
+              if (auth.currentUser) {
+                saveGameToHistory(
+                  { uid: auth.currentUser.uid, nickname: nickname || "Guest" },
+                  { uid: "bot", nickname: "Bot" },
+                  "bot"
+                );
+              }
+              return;
+            }
+          }
+
+          // 2. Проверяем — может игрок выиграть следующим ходом? Блокируем!
+          for (let i of availableMoves) {
+            const test = [...nextSquares];
+            test[i] = "X";
+            if (calculateWinner(test)?.winner === "X") {
+              const botSquares = [...nextSquares];
+              botSquares[i] = "O";
+              const botHistory = [...nextHistory, botSquares];
+              setHistory(botHistory);
+              setCurrentMove(botHistory.length - 1);
+              setIsBotThinking(false);
+              return;
+            }
+          }
+
+          // 3. Если ничего критичного — просто случайный ход (как раньше)
           const randomIndex =
             availableMoves[Math.floor(Math.random() * availableMoves.length)];
           const botSquares = [...nextSquares];
@@ -85,21 +125,8 @@ function Game() {
           setCurrentMove(botHistory.length - 1);
           setIsBotThinking(false);
 
-          const botWinnerInfo = calculateWinner(botSquares);
-          const botWinner = botWinnerInfo ? botWinnerInfo.winner : null;
-          if (botWinner === "O") {
-            updateLeaderboard(nickname, "loss");
-
-            if (auth.currentUser) {
-              saveGameToHistory(
-                { uid: auth.currentUser.uid, nickname: nickname || "Guest" },
-                { uid: "bot", nickname: "Bot" },
-                "bot"
-              );
-            }
-          }
-
-          if (!botWinner && !botSquares.includes(null)) {
+          const finalWinner = calculateWinner(botSquares);
+          if (!finalWinner && !botSquares.includes(null)) {
             updateLeaderboard(nickname, "draw");
             if (auth.currentUser) {
               saveGameToHistory(

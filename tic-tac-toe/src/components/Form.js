@@ -96,7 +96,7 @@ const EmailVerificationToast = ({ email, onClose }) => {
               cursor: "pointer",
             }}
           >
-            Continue to Game
+            Continue to Login
           </button>
         </div>
       </div>
@@ -151,9 +151,10 @@ function Form() {
       navigate("/game");
       return { success: true };
     } catch (error) {
+      const message = getFirebaseErrorMessage(error.code);
       return {
         success: false,
-        password: getFirebaseErrorMessage(error.code),
+        error: message,
       };
     } finally {
       setIsLoading(false);
@@ -194,9 +195,10 @@ function Form() {
       return { success: true };
     } catch (error) {
       console.error("Firebase register error:", error);
+      const message = getFirebaseErrorMessage(error.code);
       return {
         success: false,
-        email: getFirebaseErrorMessage(error.code),
+        error: message,
       };
     } finally {
       setIsLoading(false);
@@ -239,11 +241,9 @@ function Form() {
 
     if (isValid) {
       const result = await firebaseLogin(email, password);
-      if (!result || !result.success) {
-        if (result?.email) {
-          newErrors.email = result.email;
-        }
-        setErrors(newErrors);
+      if (!result?.success) {
+        newErrors.password = result?.error || "Login failed";
+        setErrors({ ...newErrors }); // ← важно: новый объект!
       }
     }
   };
@@ -278,11 +278,9 @@ function Form() {
 
     if (isValid) {
       const result = await firebaseRegister(nickname, email, password);
-      if (!result || !result.success) {
-        if (result?.email) {
-          newErrors.email = result.email;
-        }
-        setErrors(newErrors);
+      if (!result?.success) {
+        newErrors.email = result?.error || "Registration failed";
+        setErrors({ ...newErrors });
       }
     }
   };
@@ -294,7 +292,11 @@ function Form() {
 
   const handleToastClose = () => {
     setShowVerificationToast(false);
-    navigate("/game");
+    setIsLoginForm(true);
+    setEmail("");
+    setPassword("");
+    setNickname("");
+    setErrors({ nickname: "", email: "", password: "" });
   };
 
   const handleAdminLogin = () => {
