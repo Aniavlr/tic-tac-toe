@@ -96,7 +96,7 @@ const EmailVerificationToast = ({ email, onClose }) => {
               cursor: "pointer",
             }}
           >
-            Continue to Game
+            Continue to Login
           </button>
         </div>
       </div>
@@ -294,7 +294,11 @@ function Form() {
 
   const handleToastClose = () => {
     setShowVerificationToast(false);
-    navigate("/game");
+    setIsLoginForm(true);
+    setEmail("");
+    setPassword("");
+    setNickname("");
+    setErrors({ nickname: "", email: "", password: "" });
   };
 
   const handleAdminLogin = () => {
