@@ -1,8 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { db, auth } from "../firebase";
+import { auth } from "../firebase";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { collection, doc, getDoc, getDocs, query } from "firebase/firestore";
+import {
+  getFirebaseErrorMessage,
+  checkIfUserIsAdmin,
+  loadGameHistory,
+  getPlayerInfo,
+  formatTimestamp,
+} from "../helper";
 
 function AdminPanel() {
   const navigate = useNavigate();
@@ -25,7 +31,7 @@ function AdminPanel() {
       setIsAuthenticated(isAdmin);
 
       if (isAdmin) {
-        loadGameHistory();
+        handleLoadGameHistory();
       } else {
         setInitialLoad(false); // Если не админ, сбрасываем флаг загрузки
       }
@@ -34,197 +40,18 @@ function AdminPanel() {
     checkAdminAuth();
   }, []);
 
-  const checkIfUserIsAdmin = async (userUid, userEmail) => {
-    try {
-      console.log("Checking admin status for:", userEmail, userUid);
-
-      // Способ 1: Проверка по email (самый надежный для начала)
-      const adminEmails = [
-        "admin@mytictactoe.com",
-        "test@admin.com",
-        "admin@example.com",
-      ];
-
-      if (adminEmails.includes(userEmail)) {
-        console.log("User is admin by email");
-        return true;
-      }
-
-      // Способ 2: Проверка через коллекцию uids
-      try {
-        const adminListRef = collection(db, "admins", "adminList", "uids");
-        const adminSnapshot = await getDocs(adminListRef);
-
-        let isAdmin = false;
-        adminSnapshot.forEach((doc) => {
-          if (doc.id === userUid) {
-            isAdmin = true;
-          }
-        });
-
-        if (isAdmin) {
-          console.log("User is admin by UID in collection");
-          return true;
-        }
-      } catch (collectionError) {
-        console.log("Collection check failed:", collectionError.message);
-      }
-
-      // Способ 3: Проверка через документ с массивом UID
-      try {
-        const adminListDoc = await getDoc(doc(db, "admins", "adminList"));
-        if (adminListDoc.exists()) {
-          const data = adminListDoc.data();
-          if (data.uids && data.uids.includes(userUid)) {
-            console.log("User is admin by UID in array");
-            return true;
-          }
-          if (data.admins && data.admins.includes(userUid)) {
-            console.log("User is admin by admins array");
-            return true;
-          }
-        }
-      } catch (docError) {
-        console.log("Document check failed:", docError.message);
-      }
-
-      console.log("User is NOT admin");
-      return false;
-    } catch (error) {
-      console.error("Error in admin check:", error);
-      return false;
-    }
-  };
-
-  const loadGameHistory = async () => {
+  const handleLoadGameHistory = async () => {
     try {
       setLoadingHistory(true);
       setError("");
-      console.log("🔄 Loading game history...");
-
-      const gameHistoryRef = collection(db, "gameHistory");
-      // Добавляем сортировку по убыванию времени окончания
-      const q = query(gameHistoryRef);
-      const querySnapshot = await getDocs(q);
-
-      console.log("📊 Found documents:", querySnapshot.size);
-
-      const history = [];
-      querySnapshot.forEach((doc) => {
-        const gameData = doc.data();
-        console.log("🎮 Game data:", doc.id, gameData);
-
-        history.push({
-          id: doc.id,
-          ...gameData,
-        });
-      });
-
-      history.sort((a, b) => {
-        const timeA = a.endedAtMs?.toDate?.() || a.endedAtMs || 0;
-        const timeB = b.endedAtMs?.toDate?.() || b.endedAtMs || 0;
-        return new Date(timeB) - new Date(timeA);
-      });
-
-      console.log(`✅ Loaded ${history.length} games`);
+      const history = await loadGameHistory(); // ← импортированная функция
       setGameHistory(history);
-      setInitialLoad(false); // Данные загружены, сбрасываем флаг первоначальной загрузки
     } catch (error) {
       console.error("❌ Error loading game history:", error);
       setError(`Failed to load game history: ${error.message}`);
-      setInitialLoad(false); // Даже при ошибке сбрасываем флаг
     } finally {
       setLoadingHistory(false);
       setInitialLoad(false);
-    }
-  };
-
-  // Функция для форматирования данных из вашей структуры
-  const getPlayerInfo = (game) => {
-    // Ваша структура: players - массив объектов с nickname и uid
-    if (
-      game.players &&
-      Array.isArray(game.players) &&
-      game.players.length >= 2
-    ) {
-      const p1 = game.players[0];
-      const p2 = game.players[1];
-      const winnerUid = game.winner;
-
-      return {
-        playerX: p1?.nickname || "Player X",
-        playerO: p2?.nickname || (p2?.uid === "bot" ? "Bot" : "Player O"),
-        winner:
-          winnerUid === "bot"
-            ? "Bot"
-            : winnerUid === p1?.uid
-            ? p1.nickname
-            : winnerUid === p2?.uid
-            ? p2.nickname
-            : winnerUid || "Draw",
-      };
-    }
-
-    const playerXUid = game.playerX || game.playerIds?.[0];
-    const playerOUid = game.playerO || game.playerIds?.[1] || "bot";
-
-    let playerXName = "Unknown";
-    let playerOName = playerOUid === "bot" ? "Bot" : "Unknown";
-
-    // Попробуем найти ники в users (если есть ссылки)
-    if (game.playerX && typeof game.playerX === "string") {
-      playerXName = game.playerX === "bot" ? "Bot" : "Player";
-    }
-    if (game.playerO && typeof game.playerO === "string") {
-      playerOName = game.playerO === "bot" ? "Bot" : "Player";
-    }
-
-    // Если есть поле nickname где-то рядом
-    if (game.playerXNickname) playerXName = game.playerXNickname;
-    if (game.playerONickname) playerOName = game.playerONickname;
-
-    const winner =
-      game.winner === "bot"
-        ? "Bot"
-        : game.winner === playerXUid
-        ? playerXName
-        : game.winner === playerOUid
-        ? playerOName
-        : game.winner || "Draw";
-
-    return {
-      playerX: playerXName,
-      playerO: playerOName,
-      winner,
-    };
-  };
-
-  const formatTimestamp = (timestamp) => {
-    if (!timestamp) return "N/A";
-
-    try {
-      // Если это Firestore timestamp
-      if (timestamp.toDate) {
-        return timestamp.toDate().toLocaleString();
-      }
-
-      // Если это число (timestamp в ms)
-      if (typeof timestamp === "number") {
-        return new Date(timestamp).toLocaleString();
-      }
-
-      // Если это строка
-      if (typeof timestamp === "string") {
-        const parsedTimestamp = parseInt(timestamp);
-        if (!isNaN(parsedTimestamp)) {
-          return new Date(parsedTimestamp).toLocaleString();
-        }
-      }
-
-      return "N/A";
-    } catch (error) {
-      console.error("Error formatting date:", error, timestamp);
-      return "N/A";
     }
   };
 
@@ -265,7 +92,7 @@ function AdminPanel() {
 
       setIsAuthenticated(true);
       setInitialLoad(true); // Устанавливаем флаг загрузки при входе
-      await loadGameHistory();
+      await handleLoadGameHistory();
     } catch (error) {
       console.error("Admin login error:", error);
       setError(getFirebaseErrorMessage(error.code));
@@ -285,18 +112,6 @@ function AdminPanel() {
     } catch (error) {
       console.error("Logout error:", error);
     }
-  };
-
-  const getFirebaseErrorMessage = (errorCode) => {
-    const errorMessages = {
-      "auth/invalid-email": "Invalid email address",
-      "auth/user-disabled": "This account has been disabled",
-      "auth/user-not-found": "No account found with this email",
-      "auth/wrong-password": "Incorrect password",
-      "auth/too-many-requests": "Too many attempts, try again later",
-      "auth/network-request-failed": "Network error, check your connection",
-    };
-    return errorMessages[errorCode] || "Authentication failed";
   };
 
   if (!isAuthenticated) {
@@ -381,7 +196,7 @@ function AdminPanel() {
           <div className="section-actions">
             {error && <span className="error-text">{error}</span>}
             <button
-              onClick={loadGameHistory}
+              onClick={handleLoadGameHistory}
               className="refresh-btn"
               disabled={loadingHistory}
             >
