@@ -2,13 +2,12 @@ import ButtonSignIn from "./ButtonSignIn";
 import ButtonRegister from "./ButtonRegister";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { auth } from "../firebase";
 import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  updateProfile,
-  sendEmailVerification,
-} from "firebase/auth";
+  validateLoginForm,
+  validateRegisterForm,
+  firebaseLogin,
+  firebaseRegister,
+} from "../helper";
 
 const EmailVerificationToast = ({ email, onClose }) => {
   return (
@@ -119,168 +118,37 @@ function Form() {
   const [showVerificationToast, setShowVerificationToast] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState("");
 
-  const firebaseLogin = async (email, password) => {
-    try {
+  const handleLogin = async () => {
+    const validation = validateLoginForm(email, password);
+    setErrors(validation.errors);
+
+    if (validation.isValid) {
       setIsLoading(true);
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-
-      if (!user.emailVerified) {
-        setErrors({ email: "Please verify your email first" });
-        return;
-      }
-
-      const displayName = user.displayName || "Guest";
-
-      localStorage.setItem(
-        "currentUser",
-        JSON.stringify({
-          nickname: displayName,
-          email: user.email,
-          isLoggedIn: true,
-          registeredAt: new Date().toISOString(),
-          uid: user.uid,
-          emailVerified: user.emailVerified,
-        })
-      );
-
-      navigate("/game");
-      return { success: true };
-    } catch (error) {
-      const message = getFirebaseErrorMessage(error.code);
-      return {
-        success: false,
-        error: message,
-      };
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const firebaseRegister = async (nickname, email, password) => {
-    try {
-      setIsLoading(true);
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-
-      await updateProfile(user, {
-        displayName: nickname,
-      });
-
-      await sendEmailVerification(user);
-
-      localStorage.setItem(
-        "currentUser",
-        JSON.stringify({
-          nickname: nickname,
-          email: user.email,
-          isLoggedIn: true,
-          registeredAt: new Date().toISOString(),
-          uid: user.uid,
-          emailVerified: false,
-        })
-      );
-
-      setVerificationEmail(email);
-      setShowVerificationToast(true);
-
-      return { success: true };
-    } catch (error) {
-      console.error("Firebase register error:", error);
-      const message = getFirebaseErrorMessage(error.code);
-      return {
-        success: false,
-        error: message,
-      };
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getFirebaseErrorMessage = (errorCode) => {
-    const errorMessages = {
-      "auth/invalid-email": "Invalid email address",
-      "auth/user-disabled": "This account has been disabled",
-      "auth/user-not-found": "No account found with this email",
-      "auth/wrong-password": "Incorrect password",
-      "auth/email-already-in-use": "Email already registered",
-      "auth/weak-password": "Password should be at least 6 characters",
-      "auth/too-many-requests": "Too many attempts, try again later",
-      "auth/network-request-failed": "Network error, check your connection",
-    };
-    return errorMessages[errorCode] || "Authentication failed";
-  };
-
-  const validateLogin = async () => {
-    const newErrors = { nickname: "", email: "", password: "" };
-    let isValid = true;
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      newErrors.email = "Please enter a valid email address";
-      isValid = false;
-    }
-
-    if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-      isValid = false;
-    } else if (password.length > 20) {
-      newErrors.password = "Password must be max 20 characters";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-
-    if (isValid) {
       const result = await firebaseLogin(email, password);
-      if (!result?.success) {
-        newErrors.password = result?.error || "Login failed";
-        setErrors({ ...newErrors }); // ← важно: новый объект!
+      setIsLoading(false);
+
+      if (result.success) {
+        navigate("/game");
+      } else {
+        setErrors((prev) => ({ ...prev, password: result.error }));
       }
     }
   };
 
-  const validateRegister = async () => {
-    const newErrors = { nickname: "", email: "", password: "" };
-    let isValid = true;
+   const handleRegister = async () => {
+    const validation = validateRegisterForm(nickname, email, password);
+    setErrors(validation.errors);
 
-    if (nickname.length < 4) {
-      newErrors.nickname = "Nickname must be at least 4 characters";
-      isValid = false;
-    } else if (nickname.length > 12) {
-      newErrors.nickname = "Nickname must be max 12 characters";
-      isValid = false;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      newErrors.email = "Please enter a valid email address";
-      isValid = false;
-    }
-
-    if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-      isValid = false;
-    } else if (password.length > 20) {
-      newErrors.password = "Password must be max 20 characters";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-
-    if (isValid) {
+    if (validation.isValid) {
+      setIsLoading(true);
       const result = await firebaseRegister(nickname, email, password);
-      if (!result?.success) {
-        newErrors.email = result?.error || "Registration failed";
-        setErrors({ ...newErrors });
+      setIsLoading(false);
+      
+      if (result.success) {
+        setVerificationEmail(result.email);
+        setShowVerificationToast(true);
+      } else {
+        setErrors(prev => ({ ...prev, email: result.error }));
       }
     }
   };
@@ -350,7 +218,7 @@ function Form() {
             ) : null}
           </div>
           <div className="buttonContainer">
-            <ButtonSignIn onValidation={validateLogin} disabled={isLoading} />
+            <ButtonSignIn onValidation={handleLogin} disabled={isLoading} />
           </div>
           <div className="form-switch">
             <p>
@@ -430,7 +298,7 @@ function Form() {
           </div>
           <div className="buttonContainer">
             <ButtonRegister
-              onValidation={validateRegister}
+              onValidation={handleRegister}
               disabled={isLoading}
             />
           </div>
