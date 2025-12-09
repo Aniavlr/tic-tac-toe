@@ -13,7 +13,7 @@ export default function HistoryOfGame() {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUid(user.uid);
-        loadHistory(user.uid);
+        loadHistory(user.uid, user.displayName || "You");
       } else {
         setUid(null);
         setList([]);
@@ -34,15 +34,26 @@ export default function HistoryOfGame() {
       const tmp = snap.docs
         .map((d) => {
           const data = d.data();
+
+          const opponent = data.players?.find((p) => p.uid !== userId);
+          const opponentName =
+            opponent?.nickname || (opponent?.uid === "bot" ? "Bot" : "Unknown");
+
+          let result;
+          if (data.winner === "draw") {
+            result = "draw";
+          } else if (data.winner === userId) {
+            result = "win";
+          } else {
+            result = "loss";
+          }
+
           return {
             id: d.id,
             date: data.endedAt?.toDate() || new Date(data.endedAt),
-            result:
-              data.winner === userId
-                ? "win"
-                : data.winner === "bot"
-                ? "loss"
-                : "draw",
+            opponent: opponentName,
+            result,
+            isBot: opponent?.uid === "bot",
           };
         })
         .sort((a, b) => b.date - a.date);
@@ -83,6 +94,7 @@ export default function HistoryOfGame() {
           <thead>
             <tr>
               <th>Date and time</th>
+              <th>VS</th>
               <th>Result</th>
             </tr>
           </thead>
@@ -90,6 +102,11 @@ export default function HistoryOfGame() {
             {list.map((g) => (
               <tr key={g.id}>
                 <td>{g.date.toLocaleString("ru-RU")}</td>
+                <td className="history-match">
+                  <span className={`opponent-name ${g.isBot ? "bot" : ""}`}>
+                    {g.opponent}
+                  </span>
+                </td>
                 <td className={`result ${g.result}`}>
                   {g.result === "win"
                     ? "Win"

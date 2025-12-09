@@ -121,7 +121,7 @@ function AccountInfa() {
   };
 
   return (
-    <div className="container">
+    <div className="account-container">
       <div className="account-header">
         <h1>My Account</h1>
         <p>Statistics and achievements</p>

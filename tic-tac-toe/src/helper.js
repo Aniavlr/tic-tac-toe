@@ -329,11 +329,11 @@ export const loadGameHistory = async () => {
 };
 
 export const getPlayerInfo = (game) => {
-  // players - массив объектов с nickname и uid
   if (game.players && Array.isArray(game.players) && game.players.length >= 2) {
     const p1 = game.players[0];
     const p2 = game.players[1];
     const winnerUid = game.winner;
+    
 
     return {
       playerX: p1?.nickname || "Player X",
