@@ -1892,7 +1892,6 @@ label {
   transform: translateY(-4px);
 }
 
-/* КРАСИВЫЙ БАННЕР ПОБЕДЫ — В ТВОЁМ СТИЛЕ */
 .game-result-banner {
   margin: 40px 0;
   padding: 32px 24px;
@@ -1924,7 +1923,6 @@ label {
   text-shadow: none;
 }
 
-/* Кнопка "Новая игра" — в стиле твоих основных кнопок */
 .new-game-btn {
   margin-top: 16px;
   padding: 18px 48px;
@@ -1958,7 +1956,6 @@ label {
   animation: floatUp 1.4s ease-out;
 }
 
-/* Цвета для каждой иконки */
 .win-emoji {
   color: #38b2ac;
   text-shadow: 0 4px 15px rgba(56, 178, 172, 0.4);
@@ -1983,7 +1980,7 @@ label {
   opacity: 1;
   transition: opacity 0.3s ease;
   position: relative;
-  min-height: 50px; /* Фиксированная высота чтобы не прыгало */
+  min-height: 50px;
 }
 
 .timer-header {
@@ -2064,6 +2061,151 @@ label {
   background: linear-gradient(90deg, #cbd5e0, #a0aec0);
   opacity: 0.5;
 }
+
+.not-found-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 100vh;
+  background: #f8f9fa;
+  font-family: "Segoe UI", "Roboto", "Oxygen", "Ubuntu", sans-serif;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.not-found-content {
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 15px 35px rgba(255, 65, 108, 0.15),
+    0 5px 15px rgba(0, 0, 0, 0.07);
+  margin-top: 50px;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.not-found-title {
+  font-size: 2.8rem;
+  color: #e74c3c;
+  margin-bottom: 15px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.not-found-message {
+  font-size: 1.2rem;
+  color: #636e72;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.not-found-illustration {
+  position: relative;
+  margin: 40px 0;
+}
+
+.not-found-error-code {
+  font-size: 8rem;
+  font-weight: 900;
+  color: rgba(255, 107, 107, 0.15);
+  line-height: 1;
+  letter-spacing: 10px;
+}
+
+.not-found-error-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  color: #ff6b6b;
+}
+
+.not-found-suggestion {
+  font-size: 1rem;
+  color: #b2bec3;
+  margin-bottom: 40px;
+  font-style: italic;
+}
+
+.not-found-home-button {
+  display: inline-block;
+  padding: 15px 35px;
+  background-color: #ff6b6b;
+  color: white;
+  text-decoration: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(255, 107, 107, 0.25);
+  margin-bottom: 30px;
+  border: none;
+  cursor: pointer;
+}
+
+.not-found-home-button:hover {
+  background-color: #ff4757;
+  transform: translateY(-3px);
+  box-shadow: 0 7px 14px rgba(255, 107, 107, 0.3);
+}
+
+.not-found-help-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.not-found-link {
+  color: #ff6b6b;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #ffcccc;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  background-color: rgba(255, 107, 107, 0.05);
+}
+
+.not-found-link:hover {
+  background-color: #ff6b6b;
+  color: white;
+  border-color: #ff6b6b;
+}
+
+.not-found-footer {
+  margin-top: 40px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Дополнительные стили для лучшего отображения */
+.not-found-home-button:active {
+  transform: translateY(-1px);
+}
+
+.not-found-link:active {
+  transform: scale(0.98);
+}
+
 @media (max-width: 768px) {
   .login-header h1 {
     font-size: 40px;

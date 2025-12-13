@@ -7,6 +7,7 @@ import HistoryPage from "./pages/HistoryPage";
 import AdminPage from "./pages/AdminPage";
 import RoomPage from "./pages/RoomPage";
 import CreatingRoom from "./components/CreatingRoom";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/create-room" element={<CreatingRoom />} />
         <Route path="/room/:roomId" element={<RoomPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   );
