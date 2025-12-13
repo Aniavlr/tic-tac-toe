@@ -6,6 +6,7 @@ import {
   saveGameToHistory,
 } from "../helper";
 import { auth } from "../firebase";
+import ButtonOnline from "./ButtonOnline";
 
 function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
@@ -37,7 +38,10 @@ function Game() {
     loadUser();
   }, []);
 
-  function handlePlay(nextSquares) {
+  function handlePlay(clickedIndex) {
+    const nextSquares = currentSquares.slice();
+    nextSquares[clickedIndex] = xIsNext ? "X" : "O";
+
     const wasXTurn = currentMove % 2 === 0;
 
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
@@ -161,24 +165,31 @@ function Game() {
   });
 
   return (
-    <div className="container">
-      <h1>Click! Win! Reign!</h1>
-      <div className="game">
-        <div className="game-board">
-          <Board
-            xIsNext={xIsNext}
-            squares={currentSquares}
-            onPlay={handlePlay}
-            isBotThinking={isBotThinking}
-            nickname={nickname}
-            isLoadingNickname={isLoadingNickname}
-          />
+    <>
+      <div className="game-container">
+        <h1>Click! Win! Reign!</h1>
+        <div className="game-content">
+          <div className="game">
+            <div className="game-board">
+              <Board
+                xIsNext={xIsNext}
+                squares={currentSquares}
+                onPlay={handlePlay}
+                isBotThinking={isBotThinking}
+                currentPlayerName={nickname}
+                isLoadingNickname={isLoadingNickname}
+              />
+            </div>
+            <div className="game-info">
+              <ol>{moves}</ol>
+            </div>
+          </div>
         </div>
-        <div className="game-info">
-          <ol>{moves}</ol>
+        <div className="online-button-wrapper">
+          <ButtonOnline />
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

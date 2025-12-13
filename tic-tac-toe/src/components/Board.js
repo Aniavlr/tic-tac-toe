@@ -5,22 +5,26 @@ function Board({
   xIsNext,
   squares,
   onPlay,
-  isBotThinking,
-  nickname,
-  isLoadingNickname,
+  isBotThinking = false,
+  isLoadingNickname = false,
+  disabled = false,
+  currentPlayerName = "Player", // Имя текущего игрока (для сети — myName, для бота — nickname)
+  opponentName = "Bot",
+  playerSymbol,
+  playerX,
+  playerO,
 }) {
   function handleClick(i) {
     if (
       squares[i] ||
       calculateWinner(squares) ||
       isBotThinking ||
-      isLoadingNickname
+      isLoadingNickname ||
+      disabled
     ) {
       return;
     }
-    const nextSquares = squares.slice();
-    nextSquares[i] = "X";
-    onPlay(nextSquares);
+    onPlay(i);
   }
 
   const winnerInfo = calculateWinner(squares);
@@ -37,19 +41,22 @@ function Board({
       </div>
     );
   } else if (winner) {
-    status = "🏆 Winner: " + (winner === "X" ? nickname : "Bot");
+    const winnerName =
+      winner === "X"
+        ? playerX?.nickname || playerX?.name || currentPlayerName
+        : playerO?.nickname || playerO?.name || opponentName;
+    status = "🏆 Winner: " + winnerName;
   } else if (squares.every((square) => square !== null)) {
     status = "🫱🏼‍🫲🏼 Draw";
   } else {
-    status = "🕐 Next player: " + (xIsNext ? nickname : "Bot");
+    status = "🕐 Next player: " + currentPlayerName;
   }
 
-  const isBoardDisabled = isBotThinking || isLoadingNickname;
+  const isBoardDisabled = isBotThinking || isLoadingNickname || disabled;
 
   const isWinningSquare = (index) => {
     return winningLine && winningLine.includes(index);
   };
-
 
   return (
     <>

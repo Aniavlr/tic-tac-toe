@@ -5,6 +5,8 @@ import LeaderboardPage from "./pages/LeaderboardPage";
 import AccountPage from "./pages/AccountPage";
 import HistoryPage from "./pages/HistoryPage";
 import AdminPage from "./pages/AdminPage";
+import RoomPage from "./pages/RoomPage";
+import CreatingRoom from "./components/CreatingRoom";
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
         <Route path="/account" element={<AccountPage />} />
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/create-room" element={<CreatingRoom />} />
+        <Route path="/room/:roomId" element={<RoomPage />} />
       </Routes>
     </Router>
   );
