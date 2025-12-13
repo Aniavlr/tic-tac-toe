@@ -117,6 +117,8 @@ function Form() {
   const [isLoginForm, setIsLoginForm] = useState(true);
   const [showVerificationToast, setShowVerificationToast] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState("");
+  const [showPasswordLogin, setShowPasswordLogin] = useState(false);
+  const [showPasswordRegister, setShowPasswordRegister] = useState(false);
 
   const handleLogin = async () => {
     const validation = validateLoginForm(email, password);
@@ -135,7 +137,7 @@ function Form() {
     }
   };
 
-   const handleRegister = async () => {
+  const handleRegister = async () => {
     const validation = validateRegisterForm(nickname, email, password);
     setErrors(validation.errors);
 
@@ -143,19 +145,21 @@ function Form() {
       setIsLoading(true);
       const result = await firebaseRegister(nickname, email, password);
       setIsLoading(false);
-      
+
       if (result.success) {
         setVerificationEmail(result.email);
         setShowVerificationToast(true);
       } else {
-        setErrors(prev => ({ ...prev, email: result.error }));
+        setErrors((prev) => ({ ...prev, email: result.error }));
       }
     }
   };
 
   const toggleForm = () => {
     setIsLoginForm(!isLoginForm);
-    setErrors({ nickname: "", email: "", password: "" }); // Очищаем ошибки при переключении
+    setErrors({ nickname: "", email: "", password: "" });
+    setShowPasswordLogin(false);
+    setShowPasswordRegister(false);
   };
 
   const handleToastClose = () => {
@@ -202,17 +206,43 @@ function Form() {
           </div>
           <div className="input-group">
             <label htmlFor="password-login">Password</label>
-            <input
-              className="input"
-              id="password-login"
-              name="password"
-              type="password"
-              minLength={6}
-              required
-              value={password}
-              maxLength={20}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="password-wrapper">
+              <input
+                className="input"
+                id="password-login"
+                name="password"
+                type={showPasswordLogin ? "text" : "password"}
+                minLength={6}
+                required
+                value={password}
+                maxLength={20}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <svg
+                onClick={() => setShowPasswordLogin((prev) => !prev)}
+                className="password-toggle-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                {showPasswordLogin ? (
+                  // Открытый глаз
+                  <>
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </>
+                ) : (
+                  // Закрытый глаз
+                  <>
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <path d="M1 1l22 22" />
+                  </>
+                )}
+              </svg>
+            </div>
             {errors.password ? (
               <span className="error-message">{errors.password}</span>
             ) : null}
@@ -281,17 +311,43 @@ function Form() {
           </div>
           <div className="input-group">
             <label htmlFor="password-register">Password</label>
-            <input
-              className="input"
-              id="password-register"
-              name="password"
-              type="password"
-              minLength={6}
-              required
-              value={password}
-              maxLength={20}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="password-wrapper">
+              <input
+                className="input"
+                id="password-register"
+                name="password"
+                type={showPasswordRegister ? "text" : "password"}
+                minLength={6}
+                required
+                value={password}
+                maxLength={20}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <svg
+                onClick={() => setShowPasswordRegister((prev) => !prev)}
+                className="password-toggle-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                {showPasswordRegister ? (
+                  // Открытый глаз
+                  <>
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </>
+                ) : (
+                  // Закрытый глаз
+                  <>
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <path d="M1 1l22 22" />
+                  </>
+                )}
+              </svg>
+            </div>
             {errors.password ? (
               <span className="error-message">{errors.password}</span>
             ) : null}

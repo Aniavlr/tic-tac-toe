@@ -382,6 +382,26 @@ label {
   font-weight: 500;
 }
 
+.password-wrapper {
+  position: relative;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  color: #aaa;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-icon:hover {
+  color: #666;
+}
+
 .input-group {
   margin-bottom: 20px;
 }
@@ -2127,8 +2147,8 @@ label {
   }
 
   .status {
-    width: 280px;
-    min-width: 280px;
+    width: 255px;
+    min-width: 255px;
   }
 
   .room-card {
