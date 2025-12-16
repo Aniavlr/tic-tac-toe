@@ -2,7 +2,7 @@
 
 A modern, full-featured **Tic-Tac-Toe** web application built with **React** and **Firebase**. Features authentication, real-time leaderboard, game history, user profiles, and bot opponent.
 
-<!-- Live Demo: [https://your-app-url.firebaseapp.com](https://your-app-url.firebaseapp.com) *(update after deploy)* -->
+Live Demo: [https://my-tic-tac-toe-app-12lcl.web.app/](https://my-tic-tac-toe-app-12lcl.web.app/)
 
 ## Features
 
